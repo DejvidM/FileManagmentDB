@@ -18,7 +18,6 @@ namespace FinalProject.Controllers
             _dbFileService = dbFileService;
         }
 
-
         // GET: api/<FileController>
         [HttpGet]
         public async Task<IActionResult> GetFiles()
@@ -40,7 +39,6 @@ namespace FinalProject.Controllers
             return Ok(file);
         }
 
-
         // POST api/<FileController>
         [HttpPost]
         public async Task<IActionResult> AddFile()
@@ -59,15 +57,14 @@ namespace FinalProject.Controllers
             {
                 var response = await _dbFileService.AddFileAsync(new FileDTO
                 {
-
                     Name = "File1",
-                    UserId = 1,
                     FileSize = fileBytes.Length,
                     FileType = mimeType,
                     FileData = fileBytes,
+                    UserId = 1,
                     FolderId = 15
-                }
-                );
+                });
+
                 return Ok(response);
             }
             catch (Exception ex) 
@@ -92,7 +89,7 @@ namespace FinalProject.Controllers
         [HttpGet("GetFolderFiles/{id}")]
         public async Task<IActionResult> GetFolderFiles(int id)
         {
-            var files = await _dbFileService.GetFolderFiles(id);
+            var files = await _dbFileService.GetFolderFilesAsync(id);
             return Ok(files);
         }
     }

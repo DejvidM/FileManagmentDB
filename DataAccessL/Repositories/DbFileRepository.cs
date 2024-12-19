@@ -17,12 +17,6 @@ namespace DataAccessL.Repositories
         {
             _context = context; 
         }
-        public async Task<DbFile> AddAsync(DbFile dbFile)
-        {
-            await _context.AddAsync(dbFile);
-            await _context.SaveChangesAsync();
-            return dbFile;
-        }
 
         public async Task<IEnumerable<DbFile>> GetAllAsync()
         {
@@ -34,6 +28,14 @@ namespace DataAccessL.Repositories
             var file = await _context.Files.FindAsync(id);
             return file;
         }
+
+        public async Task<DbFile> AddAsync(DbFile dbFile)
+        {
+            await _context.AddAsync(dbFile);
+            await _context.SaveChangesAsync();
+            return dbFile;
+        }
+
 
         public async Task<bool> RemoveAsync(DbFile dbFile)
         {        

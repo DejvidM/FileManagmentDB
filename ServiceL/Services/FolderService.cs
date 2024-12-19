@@ -22,44 +22,6 @@ namespace ServiceL.Services
             _dbFileRepository = dbFileRepository;
         }
 
-        public async Task<FolderDTO> AddFolderAsync(FolderDTO folderDTO)
-        {
-            if (folderDTO == null) 
-            {
-                throw new Exception("Folder can not be null!");
-            }
-
-            var folder = new Folder
-            {
-                Name = folderDTO.Name,
-                UserId = folderDTO.UserId,
-                ParentId = folderDTO.ParentId ?? null
-            };
-
-
-            var addedFolder = await _foldersRepository.AddAsync(folder);
-            return new FolderDTO 
-            { 
-                Id = addedFolder.Id,
-                Name = addedFolder.Name,
-                UserId = addedFolder.UserId,
-                ParentId = addedFolder.ParentId 
-            };
-        }
-
-        public async Task<bool> DeleteFoldersAsync(int id)
-        {
-            var folder = await _foldersRepository.GetByIdAsync(id);
-            if (folder != null)
-            {
-                
-                var response = await _foldersRepository.DeleteAsync(folder);
-                return response;
-               
-            }
-
-            return false;
-        }
         public async Task<IEnumerable<FolderDTO>> GetAllFoldersAsync()
         {
             var folders = await _foldersRepository.GetAllAsync();
@@ -77,6 +39,50 @@ namespace ServiceL.Services
             }
 
             return folderDTO;
+        }
+        public async Task<FolderDTO> AddFolderAsync(FolderDTO folderDTO)
+        {
+            if (folderDTO == null) 
+            {
+                throw new Exception("Folder can not be null!");
+            }
+
+            var folder = new Folder
+            {
+                Name = folderDTO.Name,
+                UserId = folderDTO.UserId,
+                ParentId = folderDTO.ParentId ?? null
+            };
+
+            var addedFolder = await _foldersRepository.AddAsync(folder);
+
+            return new FolderDTO 
+            { 
+                Id = addedFolder.Id,
+                Name = addedFolder.Name,
+                UserId = addedFolder.UserId,
+                ParentId = addedFolder.ParentId 
+            };
+        }
+
+        public async Task<bool> DeleteFoldersAsync(int id)
+        {
+            var folder = await _foldersRepository.GetByIdAsync(id);
+
+            if (folder == null)
+            {
+                throw new Exception("Folder could not be found.");
+            }
+            try 
+            {
+                var response = await _foldersRepository.DeleteAsync(folder);
+                
+                return response;
+            }
+            catch
+            {
+                throw new Exception($"Folder has other you might need.Delete those to delete {folder.Name}");
+            }
         }
 
         //public async Task<Folder> GetFolderByIdAsync(int id)

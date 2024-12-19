@@ -10,12 +10,12 @@ namespace ServiceL.Interfaces
 {
     public interface IDbFileService
     {
-        Task<DbFile> AddFileAsync(FileDTO fileDTO);
-        Task<bool> RemoveFileAsync(int id);
         Task<IEnumerable<DbFile>> GetAllFilesAsync();
         Task<DbFile> GetFileByIdAsync(int id);
+        Task<DbFile> AddFileAsync(FileDTO fileDTO);
+        Task<bool> RemoveFileAsync(int id);
+        Task<IEnumerable<DbFile>> GetFolderFilesAsync(int folderId);
         public string GetMimeType(string filePath);
-        Task<IEnumerable<DbFile>> GetFolderFiles(int folderId);
 
     }
 }

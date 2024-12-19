@@ -13,23 +13,47 @@ namespace ServiceL.Services
     public class DbFileService : IDbFileService
     {
         private readonly IDbFileRepository _dbFileRepository;
+        private readonly IFoldersRepository _foldersRepository;
 
-        public DbFileService(IDbFileRepository dbFileRepository)
+        public DbFileService(IDbFileRepository dbFileRepository, IFoldersRepository foldersRepository)
         {
             _dbFileRepository = dbFileRepository;
+            _foldersRepository = foldersRepository;
+        }
+        public Task<IEnumerable<DbFile>> GetAllFilesAsync()
+        {
+            return _dbFileRepository.GetAllAsync();
+        }
+
+        public async Task<DbFile> GetFileByIdAsync(int id)
+        {
+            var file = await _dbFileRepository.GetByIdAsync(id);
+
+            if (file == null)
+            {
+                return null;
+            }
+
+            return file;
         }
 
         public async Task<DbFile> AddFileAsync(FileDTO fileDTO)
         {
+            var folder = await _foldersRepository.GetByIdAsync(fileDTO.FolderId);
+            
+            if(folder.UserId != fileDTO.UserId)
+            {
+                throw new Exception("Files must belong to the user of the folder.");
+            }
+
             var file = await _dbFileRepository.AddAsync(new DbFile
             {
-                Id = fileDTO.Id,
                 Name = fileDTO.Name,
                 FileSize = fileDTO.FileSize,
                 FileType = fileDTO.FileType,
                 FileData = fileDTO.FileData,
                 UserId = fileDTO.UserId,
-                FolderId = fileDTO.FolderId,
+                FolderId = fileDTO.FolderId
             });
 
             return file;
@@ -47,24 +71,7 @@ namespace ServiceL.Services
             return false;
         }
 
-        public Task<IEnumerable<DbFile>> GetAllFilesAsync()
-        {
-            return _dbFileRepository.GetAllAsync();
-        }
-
-        public async Task<DbFile> GetFileByIdAsync(int id)
-        {
-            var file = await _dbFileRepository.GetByIdAsync(id);
-
-            if(file == null)
-            {
-                return null;
-            }
-
-            return file;
-        }
-
-        public async Task<IEnumerable<DbFile>> GetFolderFiles(int folderId)
+        public async Task<IEnumerable<DbFile>> GetFolderFilesAsync(int folderId)
         {
             var files = await _dbFileRepository.GetFolderFiles(folderId);
             return files;

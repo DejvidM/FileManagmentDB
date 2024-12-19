@@ -17,7 +17,6 @@ namespace FinalProject.Controllers
         {
             _folderService = folderService;
         }
-        
 
         // GET: api/<FolderController>
         [HttpGet]
@@ -54,7 +53,7 @@ namespace FinalProject.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Error = ex.Message, InnerException = ex.InnerException?.Message });
+                return BadRequest(ex.Message);
             }
 
         }
@@ -63,13 +62,15 @@ namespace FinalProject.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await _folderService.DeleteFoldersAsync(id);
-            if (response)
+            try
             {
-                return Ok("Folder is deleted");
+                var response = await _folderService.DeleteFoldersAsync(id);
+                return Ok(response);
             }
-
-            return NotFound();
+            catch (Exception ex)
+            {   
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("Rename")]
@@ -77,6 +78,7 @@ namespace FinalProject.Controllers
         {
 
             var folder = await _folderService.RenameFolderAsync(renameFolderDTO);
+
             if (folder == null)
             {
                 return NotFound();

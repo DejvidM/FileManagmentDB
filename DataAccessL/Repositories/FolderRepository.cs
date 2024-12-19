@@ -19,13 +19,11 @@ namespace DataAccessL.Repositories
         {
             _context = context;
         }
-
-       public async Task<Folder> AddAsync(Folder folder)
+        public async Task<IEnumerable<Folder>> GetAllAsync()
         {
-            await _context.Folders.AddAsync(folder);
-            _context.SaveChanges();
-            return folder;
-        }                  
+            return await _context.Folders.ToListAsync();
+            
+        }
 
         public async Task<Folder> GetByIdAsync(int id)
         {
@@ -39,11 +37,13 @@ namespace DataAccessL.Repositories
            
         }
 
-        public async Task<IEnumerable<Folder>> GetAllAsync()
+       public async Task<Folder> AddAsync(Folder folder)
         {
-            return await _context.Folders.ToListAsync();
-            
-        }
+            await _context.Folders.AddAsync(folder);
+            _context.SaveChanges();
+            return folder;
+        }                  
+
 
         public async Task<bool> DeleteAsync(Folder folder)
         {
@@ -121,7 +121,6 @@ namespace DataAccessL.Repositories
 
         //    return nestedFolders;
         //}
-
         public async Task<List<Folder>> GetAllUserFoldersFiles(int userId)
         {
             // Fetch all root folders for the user

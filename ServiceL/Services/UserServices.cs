@@ -31,25 +31,6 @@ namespace ServiceL.Services
             _folderRepository = folderRepository;
         }
 
-        public async Task<UserDTO> GetUserByIdAsync(int id)
-        {
-            var user = await _userRepository.GetByIdAsync(id);
-            if (user == null) 
-            {
-                return null;
-            }
-
-            var userFolders = await _folderRepository.GetAllUserFoldersFiles(id);
-
-            return new UserDTO
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Folders = userFolders
-            };
-
-        }
-
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             return await _userRepository.GetAllAsync();
@@ -79,7 +60,25 @@ namespace ServiceL.Services
             var response = await _userRepository.DeleteAsync(user);
             return response;
         }
+        public async Task<UserDTO> GetUserByIdAsync(int id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
 
+            if (user == null) 
+            {
+                return null;
+            }
+
+            var userFolders = await _folderRepository.GetAllUserFoldersFiles(id);
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Folders = userFolders
+            };
+
+        }
         public async Task<User> LogInUser(string email, string password)
         {
             var user = await _userRepository.FindByEmail(email);
