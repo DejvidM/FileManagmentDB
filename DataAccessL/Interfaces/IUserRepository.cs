@@ -13,7 +13,6 @@ namespace DataAccessL.Interfaces
         Task<User> GetByIdAsync(int id);
         Task<IEnumerable<User>> GetAllAsync();
         Task<User> AddAsync(User user);
-        Task UpdateAsync(User user);
         Task<bool> DeleteAsync(User user);
         Task<User> FindByEmail(string email);
     }

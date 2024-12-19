@@ -44,11 +44,6 @@ namespace ServiceL.Services
             return user;
         }
 
-        public async Task UpdateUserAsync(User user)
-        {
-            await _userRepository.UpdateAsync(user);
-        }
-
         public async Task<bool> DeleteUserAsync(int id)
         {
             var user = await _userRepository.GetByIdAsync(id);

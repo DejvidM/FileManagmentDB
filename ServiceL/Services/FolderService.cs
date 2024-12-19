@@ -85,21 +85,8 @@ namespace ServiceL.Services
             }
         }
 
-        //public async Task<Folder> GetFolderByIdAsync(int id)
-        //{
-        //    var folder = await _foldersRepository.GetByIdAsync(id);
-        //    if (folder == null)
-        //        return null;
-
-        //    folder.Files = await _dbFileRepository.GetFolderFiles(id);
-
-        //    folder.Folders = await _foldersRepository.FindNestedFolders(id);
-
-        //    return folder;
-        //}
         public async Task<Folder> GetFolderByIdAsync(int id)
         {
-            // Declare and initialize the HashSet locally
             var visitedFolderIds = new HashSet<int>();
 
             return await GetFolderByIdWithCycleCheckAsync(id, visitedFolderIds);
@@ -107,22 +94,12 @@ namespace ServiceL.Services
 
         private async Task<Folder> GetFolderByIdWithCycleCheckAsync(int id, HashSet<int> visitedFolderIds)
         {
-            // Check if this folder has already been processed to prevent cycles
-            if (visitedFolderIds.Contains(id))
-                return null;
-
-            visitedFolderIds.Add(id);
-
-
-            // Fetch the folder by ID
             var folder = await _foldersRepository.GetByIdAsync(id);
             if (folder == null)
                 return null;
 
-            // Fetch files for the folder
             folder.Files = await _dbFileRepository.GetFolderFiles(id);
 
-            // Fetch nested folders recursively
             folder.Folders = await _foldersRepository.FindNestedFolders(id, visitedFolderIds);
 
             return folder;

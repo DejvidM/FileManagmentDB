@@ -45,13 +45,6 @@ namespace FinalProject.Controllers
 
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddUser(User user)
-        {
-            await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetAllUsers), new { id = user.Id }, user);
-        }
-
         [HttpPost("DeleteUser")]
         public async Task<IActionResult> DeleteUser(int id)
         {

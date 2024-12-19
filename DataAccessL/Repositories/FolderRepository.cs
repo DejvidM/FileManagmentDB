@@ -67,60 +67,6 @@ namespace DataAccessL.Repositories
             };
         }
 
-        //public async Task<List<Folder>> GetAllUserFoldersFiles(int userId)
-        //{
-        //    var folders = await _context.Folders.
-        //        Where(folder => folder.UserId == userId && folder.ParentId == null).
-        //        Select(folder => new Folder
-        //        {
-        //            Id = folder.Id,
-        //            Name = folder.Name,
-        //            UserId = folder.UserId,
-        //            ParentId = folder.ParentId
-        //        }).
-        //        ToListAsync();
-
-        //    foreach(var folder in folders)
-        //    {
-        //        var nestedFolders = await FindNestedFolders(folder.Id);
-        //        folder.Folders = nestedFolders;
-        //    }
-
-        //    return folders;
-        //}
-
-        //public async Task<List<Folder>> FindNestedFolders(int folderId)
-        //{
-        //    var nestedFolders = await _context.Folders
-        //        .Where(f => f.ParentId == folderId)
-        //        .ToListAsync();
-
-        //    foreach (var nestedFolder in nestedFolders)
-        //    {
-        //        nestedFolder.Files = await _context.Files.
-        //                Where(file => file.FolderId == nestedFolder.Id).
-        //                Select(file => new DbFile
-        //                {
-        //                    Id = file.Id,
-        //                    Name = file.Name,
-        //                    FileSize = file.FileSize,
-        //                    FileType = file.FileType,
-        //                    FileData = file.FileData,
-        //                    UserId = file.UserId,
-        //                    FolderId = file.FolderId
-        //                }).
-        //                ToListAsync();
-
-        //        if (_context.Folders.Any(f => f.ParentId == nestedFolder.Id))
-        //        {
-        //            nestedFolder.Folders = await FindNestedFolders(nestedFolder.Id);
-        //        }
-        //    }
-
-
-
-        //    return nestedFolders;
-        //}
         public async Task<List<Folder>> GetAllUserFoldersFiles(int userId)
         {
             // Fetch all root folders for the user

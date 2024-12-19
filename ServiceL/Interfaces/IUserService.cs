@@ -14,7 +14,6 @@ namespace ServiceL.Interfaces
         Task<UserDTO> GetUserByIdAsync(int id);
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> AddUserAsync(User user);
-        Task UpdateUserAsync(User user);
         Task<bool> DeleteUserAsync(int id);
         Task<User> LogInUser(string email, string password);
     }
