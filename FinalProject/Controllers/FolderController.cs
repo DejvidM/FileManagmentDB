@@ -1,4 +1,5 @@
-﻿using FinalProject.DTO;
+﻿using DomainL.Entities;
+using FinalProject.DTO;
 using Microsoft.AspNetCore.Mvc;
 using ServiceL.DTO;
 using ServiceL.Interfaces;
@@ -18,7 +19,6 @@ namespace FinalProject.Controllers
             _folderService = folderService;
         }
 
-        // GET: api/<FolderController>
         [HttpGet]
         public async Task<IActionResult> GetFolders()
         {   
@@ -27,7 +27,6 @@ namespace FinalProject.Controllers
             return Ok(folders);
         }
 
-        // GET api/<FolderController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFolder(int id)
         {
@@ -41,7 +40,6 @@ namespace FinalProject.Controllers
             return Ok(folder);
         }
 
-        // POST api/<FolderController>
         [HttpPost]
         public async Task<IActionResult> CreateFolder([FromBody] FolderDTO folderDTO)
         {
@@ -58,7 +56,6 @@ namespace FinalProject.Controllers
 
         }
 
-        // DELETE api/<FolderController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -85,6 +82,41 @@ namespace FinalProject.Controllers
             }
 
             return Ok(folder);
+        }
+
+        [HttpPost("MoveFolder")]
+        public async Task<IActionResult> MoveFolder(int originFolderId, int destinationFolderId)
+        {
+            try
+            {
+                var response = await _folderService.MoveFolderAsync(originFolderId, destinationFolderId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("SearchFolderByName")]
+        public async Task<IActionResult> SearchForFolder(string folderName)
+        {
+            var folders = await _folderService.GetAllFoldersAsync();
+            var matchingFolders = folders.Where(f => f.Name.ToLower().Contains(folderName)).ToList();
+
+            if( matchingFolders.Count() == 0)
+            {
+                return NotFound();
+            }
+
+            var newList = new List<Folder>();
+            
+            foreach( FolderDTO folder in matchingFolders)
+            {
+                newList.Add(await _folderService.GetFolderByIdAsync(folder.Id));
+            }
+
+            return Ok(newList);
         }
 
     }

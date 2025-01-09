@@ -77,6 +77,18 @@ namespace ServiceL.Services
             return files;
         }
 
+        public async Task<int> MoveFileAsync(int fileId, int folderId)
+        {
+            var folder = await _foldersRepository.GetByIdAsync(folderId);
+
+            if(folder == null)
+            {
+                throw new Exception("Folder does not exist!");
+            }
+
+            return await _dbFileRepository.MoveFileInFolder(fileId, folderId);
+        }
+
         public string GetMimeType(string filePath)
         {
             var extension = Path.GetExtension(filePath).ToLowerInvariant();

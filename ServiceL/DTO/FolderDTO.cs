@@ -1,4 +1,6 @@
-﻿namespace ServiceL.DTO
+﻿using DomainL.Entities;
+
+namespace ServiceL.DTO
 {
     public class FolderDTO
     {
@@ -6,5 +8,6 @@
         public required string Name { get; set; }
         public required int UserId { get; set; }
         public int? ParentId { get; set; }   
+
     }
 }

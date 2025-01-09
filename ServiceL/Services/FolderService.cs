@@ -51,7 +51,7 @@ namespace ServiceL.Services
             {
                 Name = folderDTO.Name,
                 UserId = folderDTO.UserId,
-                ParentId = folderDTO.ParentId ?? null
+                ParentId = folderDTO.ParentId
             };
 
             var addedFolder = await _foldersRepository.AddAsync(folder);
@@ -81,7 +81,7 @@ namespace ServiceL.Services
             }
             catch
             {
-                throw new Exception($"Folder has other you might need.Delete those to delete {folder.Name}");
+                throw new Exception($"Folder has other folders you might need.Delete those to delete {folder.Name}");
             }
         }
 
@@ -118,5 +118,27 @@ namespace ServiceL.Services
             return null;
 
         }
+
+        public async Task<Folder> MoveFolderAsync(int originFolderId, int destinationFolderId)
+        {
+            var originFolder = await _foldersRepository.GetByIdAsync(originFolderId);
+            var destinationFolder = await _foldersRepository.GetByIdAsync(destinationFolderId);
+
+            var visitedFoldersId = new HashSet<int>();
+
+            if(originFolder == null || destinationFolder == null)
+            {
+                throw new Exception("One of the folders' Id is incorrect");
+            }
+
+            var nestedOriginFolders = await _foldersRepository.FindNestedFolders(originFolderId, visitedFoldersId);
+            if (visitedFoldersId.Contains(destinationFolderId))
+            {
+                throw new Exception("Parent folder can not go to child folder");
+            }
+
+            return await _foldersRepository.MoveFolder(originFolder, destinationFolder);
+        }
+
     }
 }

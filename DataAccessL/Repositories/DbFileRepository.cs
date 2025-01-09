@@ -63,5 +63,19 @@ namespace DataAccessL.Repositories
                 
                 return files;
         }
+
+        public async Task<int> MoveFileInFolder(int fileId,  int folderId)
+        {
+            var file = await GetByIdAsync(fileId);
+
+            if (file == null)
+            {
+                throw new Exception("File not found!");
+            }
+
+            file.FolderId = folderId;
+            await _context.SaveChangesAsync();
+            return file.FolderId;
+        }
     }
 }

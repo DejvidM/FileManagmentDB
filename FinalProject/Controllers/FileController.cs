@@ -18,7 +18,6 @@ namespace FinalProject.Controllers
             _dbFileService = dbFileService;
         }
 
-        // GET: api/<FileController>
         [HttpGet]
         public async Task<IActionResult> GetFiles()
         {
@@ -26,7 +25,6 @@ namespace FinalProject.Controllers
             return Ok(files);
         }
 
-        // GET api/<FileController>/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFileById(int id)
         {
@@ -39,7 +37,6 @@ namespace FinalProject.Controllers
             return Ok(file);
         }
 
-        // POST api/<FileController>
         [HttpPost]
         public async Task<IActionResult> AddFile()
         {
@@ -73,7 +70,6 @@ namespace FinalProject.Controllers
             }
         }
 
-        // DELETE api/<FileController>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFileById(int id)
         {
@@ -86,11 +82,52 @@ namespace FinalProject.Controllers
             return NotFound();
         }
 
-        [HttpGet("GetFolderFiles/{id}")]
-        public async Task<IActionResult> GetFolderFiles(int id)
+        [HttpGet("GetFolderFiles/{folderId}")]
+        public async Task<IActionResult> GetFolderFiles(int folderId)
         {
-            var files = await _dbFileService.GetFolderFilesAsync(id);
+            var files = await _dbFileService.GetFolderFilesAsync(folderId);
             return Ok(files);
+        }
+
+        [HttpGet("DownloadFile")]
+        public async Task<IActionResult> DownloadFile(int fileId)
+        {
+
+            var file = await _dbFileService.GetFileByIdAsync(fileId);
+
+            if (file == null)
+            {
+                return NotFound();
+            }
+
+            if (file.FileData == null || string.IsNullOrEmpty(file.Name) || string.IsNullOrEmpty(file.FileType))
+            {
+                return BadRequest("Invalid file data.");
+            }
+
+            return File(file.FileData, file.FileType, file.Name);
+        }
+
+        [HttpPost("MoveFile")]
+        public async Task<IActionResult> MoveFile(int fileId,int folderId)
+        {
+            try
+            {
+                var response = await _dbFileService.MoveFileAsync(fileId, folderId);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpPost("SearchFileByName")]
+        public async Task<IActionResult> SearchFileByName(string fileName)
+        {
+            var files = await _dbFileService.GetAllFilesAsync();
+            
+            return Ok(files.Where(f => f.Name.ToLower().Contains(fileName)));
         }
     }
 }

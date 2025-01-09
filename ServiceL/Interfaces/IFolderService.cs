@@ -15,5 +15,6 @@ namespace ServiceL.Interfaces
         Task<IEnumerable<FolderDTO>> GetAllFoldersAsync();
         Task<bool> DeleteFoldersAsync(int id);
         Task<Folder> RenameFolderAsync(RenameFolderDTO renameFolderDTO);
+        Task<Folder> MoveFolderAsync(int originFolderId, int destiantionFolderId);
     }
 }

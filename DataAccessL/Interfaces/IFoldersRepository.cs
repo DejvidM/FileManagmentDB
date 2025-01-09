@@ -17,6 +17,7 @@ namespace DataAccessL.Interfaces
         Task<Folder> RenameFolder(Folder folder, string newName);
         Task<List<Folder>> GetAllUserFoldersFiles(int userId);
         Task<List<Folder>> FindNestedFolders(int folderId, HashSet<int> visitedFolderIds);
+        Task<Folder> MoveFolder(Folder originFolder, Folder destinationFolder);
 
     }
 }

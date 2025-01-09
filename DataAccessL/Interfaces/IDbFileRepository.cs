@@ -14,5 +14,6 @@ namespace DataAccessL.Interfaces
         Task<DbFile> AddAsync(DbFile dbFile);
         Task<bool> RemoveAsync(DbFile dbFile);
         Task<List<DbFile>> GetFolderFiles(int folderId);
+        Task<int> MoveFileInFolder(int fileId, int folderId);
     }
 }

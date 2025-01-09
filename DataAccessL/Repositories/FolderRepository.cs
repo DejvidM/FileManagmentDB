@@ -147,6 +147,19 @@ namespace DataAccessL.Repositories
             return nestedFolders;
         }
 
+        public async Task<Folder> MoveFolder(Folder originFolder, Folder destinationFolder)
+        {
+            originFolder.ParentId = destinationFolder.Id;
+            await _context.SaveChangesAsync();
+            return new Folder
+            {
+                Id = originFolder.Id,
+                Name = originFolder.Name,
+                UserId = originFolder.UserId,
+                ParentId = originFolder.ParentId
+            };
+        }
+
     }
 }
 

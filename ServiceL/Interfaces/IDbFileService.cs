@@ -15,6 +15,7 @@ namespace ServiceL.Interfaces
         Task<DbFile> AddFileAsync(FileDTO fileDTO);
         Task<bool> RemoveFileAsync(int id);
         Task<IEnumerable<DbFile>> GetFolderFilesAsync(int folderId);
+        Task<int> MoveFileAsync(int fileId, int folderId);
         public string GetMimeType(string filePath);
 
     }
