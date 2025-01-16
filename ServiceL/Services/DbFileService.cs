@@ -59,16 +59,31 @@ namespace ServiceL.Services
             return file;
         }
 
-        public async Task<bool> RemoveFileAsync(int id)
+        public async Task<RemovingFileDTO> RemoveFileAsync(int[] id)
         {
-            var file = await _dbFileRepository.GetByIdAsync(id);
-            if (file != null)
+            string success = "";
+            string errors = "";
+
+            for (int i = 0; i < id.Length; i++)
             {
-                var response = await _dbFileRepository.RemoveAsync(file);
-                return response;
+                var file = await _dbFileRepository.GetByIdAsync(id[i]);
+                if (file != null)
+                {
+                    await _dbFileRepository.RemoveAsync(file);
+                    success += $"File (Id = {id[i]} deleted successfully.\n)";
+
+                }
+                else
+                { 
+                    errors += $"File (Id = {id[i]}) does not exist!\n";
+                }
             }
 
-            return false;
+            return new RemovingFileDTO
+            {
+                Response = success,
+                Errors = errors
+            };
         }
 
         public async Task<IEnumerable<DbFile>> GetFolderFilesAsync(int folderId)

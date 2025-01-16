@@ -13,7 +13,7 @@ namespace DataAccessL.Interfaces
         Task<Folder> AddAsync(Folder folder);
         Task<Folder> GetByIdAsync(int id);
         Task<IEnumerable<Folder>> GetAllAsync();
-        Task<bool> DeleteAsync(Folder folder);
+        Task DeleteAsync(int folderId);
         Task<Folder> RenameFolder(Folder folder, string newName);
         Task<List<Folder>> GetAllUserFoldersFiles(int userId);
         Task<List<Folder>> FindNestedFolders(int folderId, HashSet<int> visitedFolderIds);

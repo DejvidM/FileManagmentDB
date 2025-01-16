@@ -58,7 +58,8 @@ namespace FinalProject.Controllers
             return Ok(new
             {
                 Token = token,
-                Message = "User registered successfully"
+                Message = "User registered successfully",
+                user.Id
             });
         }
 
@@ -67,7 +68,10 @@ namespace FinalProject.Controllers
         {
             if (string.IsNullOrWhiteSpace(loginDTO.Email) || string.IsNullOrWhiteSpace(loginDTO.Password))
             {
-                return BadRequest("Email and password are required");
+                return BadRequest(new
+                {
+                    Erorr = "Email and Password are required"
+                });
             }
 
             try
@@ -79,7 +83,8 @@ namespace FinalProject.Controllers
                 return Ok(new
                 {
                     Token = token,
-                    Message = "User logged in successfully"
+                    Message = "User logged in successfully",
+                    user.Id
                 });
 
             }
