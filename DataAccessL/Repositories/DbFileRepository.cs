@@ -37,13 +37,10 @@ namespace DataAccessL.Repositories
         }
 
 
-        public async Task<bool> RemoveAsync(DbFile dbFile)
+        public async Task RemoveAsync(DbFile dbFile)
         {        
             _context.Files.Remove(dbFile);
             await _context.SaveChangesAsync();
-            return true;
-            
-
         }
         public async Task<List<DbFile>> GetFolderFiles(int folderId)
         {

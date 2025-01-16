@@ -56,7 +56,7 @@ namespace DataAccessL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Files");
+                    b.ToTable("Files", (string)null);
                 });
 
             modelBuilder.Entity("DomainL.Entities.Folder", b =>
@@ -83,7 +83,7 @@ namespace DataAccessL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Folders");
+                    b.ToTable("Folders", (string)null);
                 });
 
             modelBuilder.Entity("DomainL.Entities.User", b =>
@@ -108,7 +108,7 @@ namespace DataAccessL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("DomainL.Entities.DbFile", b =>

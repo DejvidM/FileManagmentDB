@@ -12,7 +12,7 @@ namespace DataAccessL.Interfaces
         Task<IEnumerable<DbFile>> GetAllAsync();
         Task<DbFile> GetByIdAsync(int id);
         Task<DbFile> AddAsync(DbFile dbFile);
-        Task<bool> RemoveAsync(DbFile dbFile);
+        Task RemoveAsync(DbFile dbFile);
         Task<List<DbFile>> GetFolderFiles(int folderId);
         Task<int> MoveFileInFolder(int fileId, int folderId);
     }

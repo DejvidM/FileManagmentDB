@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
+using Microsoft.IdentityModel.Tokens;
 using ServiceL.DTO;
 using ServiceL.Interfaces;
 
@@ -40,12 +41,13 @@ namespace FinalProject.Controllers
         [HttpPost]
         public async Task<IActionResult> AddFile()
         {
-            var filePath = @"C:\Users\hp\Downloads\practice_file.txt";
+            var filePath = @"C:\Users\hp\OneDrive\Pictures\Screenshots 1\2025-01-09.png";
 
             if (!System.IO.File.Exists(filePath))
             {
                 return BadRequest("File not found at the specified path.");
             }
+
             byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
 
             string mimeType = _dbFileService.GetMimeType(filePath);            
@@ -59,7 +61,7 @@ namespace FinalProject.Controllers
                     FileType = mimeType,
                     FileData = fileBytes,
                     UserId = 1,
-                    FolderId = 15
+                    FolderId = 6
                 });
 
                 return Ok(response);
@@ -70,16 +72,21 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFileById(int id)
+        [HttpDelete("DeleteFile")]
+        public async Task<IActionResult> DeleteFileById(int[] id)
         {
-            var response = await _dbFileService.RemoveFileAsync(id);
-            if (response)
+            if(id.Count() == 0) 
             {
-                return Ok("File deleted succesfully");
+                return BadRequest();
             }
+            var response = await _dbFileService.RemoveFileAsync(id);
 
-            return NotFound();
+            return Ok(new 
+            {
+                response.Response,
+                response.Errors
+            });
+            
         }
 
         [HttpGet("GetFolderFiles/{folderId}")]
@@ -102,7 +109,10 @@ namespace FinalProject.Controllers
 
             if (file.FileData == null || string.IsNullOrEmpty(file.Name) || string.IsNullOrEmpty(file.FileType))
             {
-                return BadRequest("Invalid file data.");
+                return BadRequest(new
+                {
+                    Message = "Invalid file data."
+                });
             }
 
             return File(file.FileData, file.FileType, file.Name);
@@ -122,12 +132,14 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpPost("SearchFileByName")]
+        [HttpGet("Search/{fileName}")]
         public async Task<IActionResult> SearchFileByName(string fileName)
         {
             var files = await _dbFileService.GetAllFilesAsync();
-            
-            return Ok(files.Where(f => f.Name.ToLower().Contains(fileName)));
+
+            return Ok(files.Where(f => f.Name.StartsWith(fileName, StringComparison.OrdinalIgnoreCase))
+                   .OrderBy(f => f.Name)
+                   .ToList());
         }
     }
 }

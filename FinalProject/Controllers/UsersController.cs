@@ -55,7 +55,7 @@ namespace FinalProject.Controllers
                 return Ok(new { message = $"User with ID {id} successfully deleted." });
             }
 
-            return NotFound("User not found");
+            return NotFound();
 
         }
     }

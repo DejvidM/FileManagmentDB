@@ -45,12 +45,12 @@ namespace DataAccessL.Repositories
         }                  
 
 
-        public async Task<bool> DeleteAsync(Folder folder)
+        public async Task DeleteAsync(int folderId)
         {
 
+            var folder = await _context.Folders.FindAsync(folderId);
             _context.Remove(folder);
             await _context.SaveChangesAsync();
-            return true;
             
         }
 
@@ -69,7 +69,6 @@ namespace DataAccessL.Repositories
 
         public async Task<List<Folder>> GetAllUserFoldersFiles(int userId)
         {
-            // Fetch all root folders for the user
             var folders = await _context.Folders
                 .Where(folder => folder.UserId == userId && folder.ParentId == null)
                 .Select(folder => new Folder
@@ -83,7 +82,6 @@ namespace DataAccessL.Repositories
 
             foreach (var folder in folders)
             {
-                // Fetch nested folders for each root folder
                 folder.Files = await _context.Files
                     .Where(file => file.FolderId == folder.Id)
                     .Select(file => new DbFile
@@ -111,7 +109,6 @@ namespace DataAccessL.Repositories
 
             visitedFolderIds.Add(folderId);
 
-            // Fetch child folders
             var nestedFolders = await _context.Folders
                 .Where(f => f.ParentId == folderId)
                 .Select(f => new Folder
@@ -125,7 +122,6 @@ namespace DataAccessL.Repositories
 
             foreach (var nestedFolder in nestedFolders)
             {
-                // Fetch files for the nested folder
                 nestedFolder.Files = await _context.Files
                     .Where(file => file.FolderId == nestedFolder.Id)
                     .Select(file => new DbFile
@@ -140,7 +136,6 @@ namespace DataAccessL.Repositories
                     })
                     .ToListAsync();
 
-                // Recursively fetch child folders
                 nestedFolder.Folders = await FindNestedFolders(nestedFolder.Id, visitedFolderIds);
             }
 

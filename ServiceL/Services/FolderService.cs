@@ -73,16 +73,26 @@ namespace ServiceL.Services
             {
                 throw new Exception("Folder could not be found.");
             }
-            try 
+            try
             {
-                var response = await _foldersRepository.DeleteAsync(folder);
-                
-                return response;
+                var folderIds = new HashSet<int>();
+                var nestedFolders = await _foldersRepository.FindNestedFolders(id, folderIds);
+
+                var folderList = folderIds.ToList();
+                folderList.Reverse();
+
+                foreach(var folderId in folderList)
+                {
+                    await _foldersRepository.DeleteAsync(folderId);
+                }
+
+                return true;
             }
-            catch
+            catch (Exception ex) 
             {
-                throw new Exception($"Folder has other folders you might need.Delete those to delete {folder.Name}");
+                throw new Exception("Error " + ex);
             }
+
         }
 
         public async Task<Folder> GetFolderByIdAsync(int id)
@@ -139,6 +149,11 @@ namespace ServiceL.Services
 
             return await _foldersRepository.MoveFolder(originFolder, destinationFolder);
         }
+
+        //public async Task<Folder> UploadFolderAsync(Folder folder)
+        //{
+            
+        //}
 
     }
 }

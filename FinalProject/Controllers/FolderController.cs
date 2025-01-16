@@ -98,13 +98,16 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpPost("SearchFolderByName")]
+        [HttpGet("Search/{folderName}")]
         public async Task<IActionResult> SearchForFolder(string folderName)
         {
             var folders = await _folderService.GetAllFoldersAsync();
-            var matchingFolders = folders.Where(f => f.Name.ToLower().Contains(folderName)).ToList();
+            var matchingFolders = folders
+                .Where(f => f.Name.StartsWith(folderName, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(f => f.Name)
+                .ToList();
 
-            if( matchingFolders.Count() == 0)
+            if ( matchingFolders.Count() == 0)
             {
                 return NotFound();
             }
@@ -118,6 +121,21 @@ namespace FinalProject.Controllers
 
             return Ok(newList);
         }
+
+        //[HttpPost("UploadFolder")]
+        //public async Task<IActionResult> UploadFolder(Folder folder)
+        //{
+        //    if (folder == null)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            Message = "Folder can not be empty"
+        //        });
+        //    }
+
+        //    var response = await _folderService.UploadFolderAsync(folder);
+        //    return Ok(response);
+        //}
 
     }
 }
