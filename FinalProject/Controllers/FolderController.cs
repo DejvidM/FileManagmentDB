@@ -122,20 +122,29 @@ namespace FinalProject.Controllers
             return Ok(newList);
         }
 
-        //[HttpPost("UploadFolder")]
-        //public async Task<IActionResult> UploadFolder(Folder folder)
-        //{
-        //    if (folder == null)
-        //    {
-        //        return BadRequest(new
-        //        {
-        //            Message = "Folder can not be empty"
-        //        });
-        //    }
+        [HttpPost("UploadFolder")]
+        public async Task<IActionResult> UploadFolder(FolderDTO folderDTO)
+        {
+            try
+            {
+                if (folderDTO == null)
+                {
+                    return BadRequest(new { Message = "Folder cannot be empty" });
+                }
 
-        //    var response = await _folderService.UploadFolderAsync(folder);
-        //    return Ok(response);
-        //}
+                if (string.IsNullOrEmpty(folderDTO.Name))
+                {
+                    return BadRequest(new { Message = "Folder name is required" });
+                }
+
+                var response = await _folderService.UploadFolderAsync(folderDTO);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Errors = ex.Message});
+            }
+        }
 
     }
 }

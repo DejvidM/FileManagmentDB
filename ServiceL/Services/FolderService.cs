@@ -149,11 +149,53 @@ namespace ServiceL.Services
 
             return await _foldersRepository.MoveFolder(originFolder, destinationFolder);
         }
-
-        //public async Task<Folder> UploadFolderAsync(Folder folder)
-        //{
+        
+        public async Task<FolderDTO> UploadFolderAsync(FolderDTO folderDTO)
+        {
+            var folder = await AddFolderAsync(new FolderDTO
+            {
+                Name = folderDTO.Name,
+                ParentId = folderDTO.ParentId,
+                UserId = folderDTO.UserId
+            });
             
-        //}
+            if(folderDTO.FileList.Count > 0)
+            {
+                foreach (var file in folderDTO.FileList) 
+                {
+
+                    var response = await _dbFileRepository.AddAsync(new DbFile
+                    {
+                        Name = file.Name,
+                        FileType = file.FileType,
+                        FileSize = file.FileSize,
+                        FileData = file.FileData,
+                        UserId = folderDTO.UserId,
+                        FolderId = folder.Id
+                    });
+                }
+                folder.FileList = folderDTO.FileList;
+            }
+            else
+            {
+                folder.FileList = [];
+            }
+
+            if (folderDTO.FolderChildrenList.Count > 0)
+            {
+                foreach (var child in folderDTO.FolderChildrenList)
+                {
+                    var childFolder = await UploadFolderAsync(child);
+                    folder.FolderChildrenList.Add(childFolder);
+                }
+            }
+            else
+            {
+                folder.FolderChildrenList = [];
+            }
+
+            return folder;
+        }
 
     }
 }

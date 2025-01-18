@@ -60,11 +60,12 @@ namespace FinalProject.Controllers
                 return BadRequest("Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.");
             }
 
-            if(registerDTO.userName.Length < 5)
+            if (registerDTO.userName.Length < 5)
             {
                 return BadRequest("Username must be at least 5 characters");
             }
-            if(users.Any(u => u.Username == registerDTO.userName))
+
+            if (users.Any(u => u.Username == registerDTO.userName))
             {
                 return BadRequest("Username is taken.");
             }

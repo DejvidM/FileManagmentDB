@@ -40,6 +40,7 @@ namespace ServiceL.Services
         public async Task<DbFile> AddFileAsync(FileDTO fileDTO)
         {
             var folder = await _foldersRepository.GetByIdAsync(fileDTO.FolderId);
+
             if (folder == null)
             {
                 throw new Exception("Folder does not exist.");

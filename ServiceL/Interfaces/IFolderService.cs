@@ -16,7 +16,7 @@ namespace ServiceL.Interfaces
         Task<bool> DeleteFoldersAsync(int id);
         Task<Folder> RenameFolderAsync(RenameFolderDTO renameFolderDTO);
         Task<Folder> MoveFolderAsync(int originFolderId, int destiantionFolderId);
-        //Task<Folder> UploadFolderAsync(Folder folder);
+        Task<FolderDTO> UploadFolderAsync(FolderDTO folderDTO);
 
     }
 }

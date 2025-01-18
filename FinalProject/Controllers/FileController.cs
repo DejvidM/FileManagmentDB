@@ -39,29 +39,18 @@ namespace FinalProject.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFile()
+        public async Task<IActionResult> AddFile([FromBody] FileDTO fileDTO)
         {
-            var filePath = @"C:\Users\hp\OneDrive\Pictures\Screenshots 1\2025-01-09.png";
-
-            if (!System.IO.File.Exists(filePath))
-            {
-                return BadRequest("File not found at the specified path.");
-            }
-
-            byte[] fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-
-            string mimeType = _dbFileService.GetMimeType(filePath);            
-
             try
             {
                 var response = await _dbFileService.AddFileAsync(new FileDTO
                 {
-                    Name = "File1",
-                    FileSize = fileBytes.Length,
-                    FileType = mimeType,
-                    FileData = fileBytes,
-                    UserId = 1,
-                    FolderId = 6
+                    Name = fileDTO.Name,
+                    FileSize = fileDTO.FileSize,
+                    FileType = fileDTO.FileType,
+                    FileData = fileDTO.FileData,
+                    UserId = fileDTO.UserId,
+                    FolderId = fileDTO.FolderId
                 });
 
                 return Ok(response);
