@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace FinalProject.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase

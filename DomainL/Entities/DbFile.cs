@@ -17,6 +17,8 @@ namespace DomainL.Entities
         public User User { get; set; }
         public required int FolderId { get; set; }
         public Folder Folder { get; set; }
+        public ICollection<FileVersion> Versions { get; set; } = new List<FileVersion>();
+
 
     }
 }

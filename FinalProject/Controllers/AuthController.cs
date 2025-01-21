@@ -78,13 +78,13 @@ namespace FinalProject.Controllers
             });
 
 
-            string token = _authService.GenerateJwtToken(user.Id, user.Username, _jwtSettings);
+            //string token = _authService.GenerateJwtToken(user.Id, user.Username, _jwtSettings);
 
             return Ok(new
             {
-                Token = token,
+                //Token = token,
                 Message = "User registered successfully",
-                user.Id
+                //user.Id
             });
         }
 

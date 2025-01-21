@@ -1,4 +1,5 @@
 ﻿using DomainL.Entities;
+using Microsoft.AspNetCore.Mvc;
 using ServiceL.DTO;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,14 @@ namespace ServiceL.Interfaces
 {
     public interface IFolderService
     {
-        Task<FolderDTO> AddFolderAsync(FolderDTO folderDTO);
-        Task<Folder> GetFolderByIdAsync(int id);
+        Task<CreatingFolderDTO> AddFolderAsync(CreatingFolderDTO creatingFolderDTO);
+        Task<Folder?> GetFolderByIdAsync(int id);
         Task<IEnumerable<FolderDTO>> GetAllFoldersAsync();
-        Task<bool> DeleteFoldersAsync(int id);
-        Task<Folder> RenameFolderAsync(RenameFolderDTO renameFolderDTO);
-        Task<Folder> MoveFolderAsync(int originFolderId, int destiantionFolderId);
-        Task<FolderDTO> UploadFolderAsync(FolderDTO folderDTO);
+        Task<bool> DeleteFoldersAsync(int[] folderIds);
+        Task<Folder?> RenameFolderAsync(RenameFolderDTO renameFolderDTO, int userId);
+        Task<Folder> MoveFolderAsync(int originFolderId, int destinationFolderId);
+        Task<IEnumerable<Folder>> SearchForFolderAsync(string folderName, int userId);
+        Task<bool> UploadFolderAsync(FolderDTO folderDTO);
 
     }
 }

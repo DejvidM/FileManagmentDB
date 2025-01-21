@@ -11,7 +11,7 @@ namespace ServiceL.Interfaces
 {
     public interface IUserService
     {
-        Task<UserDTO> GetUserByIdAsync(int id);
+        Task<UserDTO?> GetUserByIdAsync(int id);
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> AddUserAsync(User user);
         Task<bool> DeleteUserAsync(int id);

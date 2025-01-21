@@ -10,10 +10,10 @@ namespace DataAccessL.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> GetByIdAsync(int id);
+        Task<User?> GetByIdAsync(int id);
         Task<IEnumerable<User>> GetAllAsync();
         Task<User> AddAsync(User user);
         Task<bool> DeleteAsync(User user);
-        Task<User> FindByEmail(string email);
+        Task<User?> FindByEmail(string email);
     }
 }

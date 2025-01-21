@@ -11,6 +11,6 @@ namespace ServiceL.DTO
     {
         public int Id { get; set; }
         public required string Username { get; set; }
-        public List<Folder> Folders { get; set; }
+        public required List<Folder> Folders { get; set; }
     }
 }

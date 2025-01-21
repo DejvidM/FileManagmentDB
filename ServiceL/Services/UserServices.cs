@@ -23,12 +23,14 @@ namespace ServiceL.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHashCompare _passwordHashCompare;
         private readonly IFoldersRepository _folderRepository;
+        private readonly IFolderService _folderService;
 
-        public UserServices(IUserRepository userRepository, IPasswordHashCompare passwordHashCompare, IFoldersRepository folderRepository)
+        public UserServices(IUserRepository userRepository, IPasswordHashCompare passwordHashCompare, IFoldersRepository folderRepository, IFolderService folderService)
         {
             _userRepository = userRepository;
             _passwordHashCompare = passwordHashCompare;
             _folderRepository = folderRepository;
+            _folderService = folderService; 
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -51,11 +53,25 @@ namespace ServiceL.Services
             {
                 return false;
             }
+            var folders = await _folderRepository.GetAllAsync();
+            var rootFolders = folders.Where(f => f.ParentId == null && f.UserId == user.Id);
+
+            foreach(var rootFolder in rootFolders)
+            {
+                try
+                {
+                    var r = await _folderService.DeleteFoldersAsync([rootFolder.Id]);
+                }
+                catch (Exception ex) 
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
 
             var response = await _userRepository.DeleteAsync(user);
-            return response;
+            return true;
         }
-        public async Task<UserDTO> GetUserByIdAsync(int id)
+        public async Task<UserDTO?> GetUserByIdAsync(int id)
         {
             var user = await _userRepository.GetByIdAsync(id);
 

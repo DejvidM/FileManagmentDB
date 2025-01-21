@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DataAccessL.DTOdata;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.IdentityModel.Tokens;
 using ServiceL.DTO;
@@ -43,15 +44,12 @@ namespace FinalProject.Controllers
         {
             try
             {
-                var response = await _dbFileService.AddFileAsync(new FileDTO
+                if (fileDTO.FileData == null || fileDTO.FileData.Length == 0)
                 {
-                    Name = fileDTO.Name,
-                    FileSize = fileDTO.FileSize,
-                    FileType = fileDTO.FileType,
-                    FileData = fileDTO.FileData,
-                    UserId = fileDTO.UserId,
-                    FolderId = fileDTO.FolderId
-                });
+                    fileDTO.FileData = Array.Empty<byte>();
+                }
+
+                var response = await _dbFileService.AddFileAsync(fileDTO);
 
                 return Ok(response);
             }
@@ -64,7 +62,7 @@ namespace FinalProject.Controllers
         [HttpDelete("DeleteFile")]
         public async Task<IActionResult> DeleteFileById(int[] id)
         {
-            if(id.Count() == 0) 
+            if(id.Length == 0) 
             {
                 return BadRequest();
             }
@@ -78,12 +76,12 @@ namespace FinalProject.Controllers
             
         }
 
-        [HttpGet("GetFolderFiles/{folderId}")]
-        public async Task<IActionResult> GetFolderFiles(int folderId)
-        {
-            var files = await _dbFileService.GetFolderFilesAsync(folderId);
-            return Ok(files);
-        }
+        //[HttpGet("GetFolderFiles/{folderId}")]
+        //public async Task<IActionResult> GetFolderFiles(int folderId)
+        //{
+        //    var files = await _dbFileService.GetFolderFilesAsync(folderId);
+        //    return Ok(files);
+        //}
 
         [HttpGet("DownloadFile")]
         public async Task<IActionResult> DownloadFile(int fileId)
@@ -103,7 +101,7 @@ namespace FinalProject.Controllers
                     Message = "Invalid file data."
                 });
             }
-
+                    
             return File(file.FileData, file.FileType, file.Name);
         }
 
@@ -113,7 +111,7 @@ namespace FinalProject.Controllers
             try
             {
                 var response = await _dbFileService.MoveFileAsync(fileId, folderId);
-                return Ok(response);
+                return Ok(new { message = "File moved successfully"});
             }
             catch (Exception ex)
             {
@@ -121,14 +119,44 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpGet("Search/{fileName}")]
-        public async Task<IActionResult> SearchFileByName(string fileName)
+        [HttpGet("Search/{fileName}/{userId}")]
+        public async Task<IActionResult> SearchFileByName(string fileName, int userId)
         {
-            var files = await _dbFileService.GetAllFilesAsync();
+            var files = await _dbFileService.SearchFilesAsync(fileName, userId);
 
-            return Ok(files.Where(f => f.Name.StartsWith(fileName, StringComparison.OrdinalIgnoreCase))
-                   .OrderBy(f => f.Name)
-                   .ToList());
+            return Ok(files);
+        }
+
+        [HttpPost("UpdateFile")]
+        public async Task<IActionResult> UpdateFile(UpdateFileDTO ufd)
+        {
+            if (ufd == null)
+                return BadRequest();
+
+            if (String.IsNullOrEmpty(ufd.Name))
+                return BadRequest("Name is required");
+
+            var response = await _dbFileService.UpdateFileAsync(ufd);
+
+            if(response == null)
+                return NotFound("File does not exist!");
+
+            return Ok(response);
+        }
+
+        [HttpGet("Rollback")]
+        public async Task<IActionResult> RollbackToPreviousVersion(int fileId)
+        {
+            try
+            {
+                var response = await _dbFileService.RollbackToPreviousVersionAsync(fileId);
+                return Ok("File reversed succesfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
     }
 }

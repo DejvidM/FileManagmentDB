@@ -1,5 +1,7 @@
-﻿using DataAccessL.Interfaces;
+﻿using DataAccessL.DTOdata;
+using DataAccessL.Interfaces;
 using DomainL.Entities;
+using Microsoft.EntityFrameworkCore;
 using ServiceL.DTO;
 using ServiceL.Interfaces;
 using System;
@@ -25,7 +27,7 @@ namespace ServiceL.Services
             return _dbFileRepository.GetAllAsync();
         }
 
-        public async Task<DbFile> GetFileByIdAsync(int id)
+        public async Task<DbFile?> GetFileByIdAsync(int id)
         {
             var file = await _dbFileRepository.GetByIdAsync(id);
 
@@ -51,7 +53,14 @@ namespace ServiceL.Services
                 throw new Exception("Files must belong to the user of the folder.");
             }
 
-            var file = await _dbFileRepository.AddAsync(new DbFile
+            var folderFiles = await _dbFileRepository.GetFolderFiles(fileDTO.FolderId);            
+
+            if (folderFiles.Any(f => f.Name == fileDTO.Name))
+            {
+                throw new Exception("A file with the same name already exists in this directory.");
+            }
+
+            var file = await _dbFileRepository.AddFileInDb(new DbFile
             {
                 Name = fileDTO.Name,
                 FileSize = fileDTO.FileSize,
@@ -75,12 +84,12 @@ namespace ServiceL.Services
                 if (file != null)
                 {
                     await _dbFileRepository.RemoveAsync(file);
-                    success += $"File (Id = {id[i]} deleted successfully.\n)";
+                    success += $"File (Id = {id[i]} deleted successfully.) {Environment.NewLine}";
 
                 }
                 else
                 { 
-                    errors += $"File (Id = {id[i]}) does not exist!\n";
+                    errors += $"File (Id = {id[i]}) does not exist! {Environment.NewLine}";
                 }
             }
 
@@ -97,16 +106,74 @@ namespace ServiceL.Services
             return files;
         }
 
-        public async Task<int> MoveFileAsync(int fileId, int folderId)
+        public async Task<bool> MoveFileAsync(int fileId, int folderId)
         {
             var folder = await _foldersRepository.GetByIdAsync(folderId);
 
-            if(folder == null)
+            var file = await _dbFileRepository.GetByIdAsync(fileId);
+
+            if (folder == null || file == null)
             {
-                throw new Exception("Folder does not exist!");
+                throw new Exception("Folder or file does not exist!");
+            }
+
+            if (file.FolderId == folderId)
+            {
+                return false;
+            }
+
+            var folderFiles = await _dbFileRepository.GetFolderFiles(folderId);
+
+            if(folderFiles.Any(f => f.Name == file!.Name))
+            {
+                throw new Exception("A file with the same name already exists in this directory.");
             }
 
             return await _dbFileRepository.MoveFileInFolder(fileId, folderId);
+        }
+
+        public async Task<IEnumerable<DbFile>> SearchFilesAsync(string name, int userId)
+        {
+            var files = await _dbFileRepository.GetAllAsync();
+
+            return files.Where(f => f.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && f.UserId == userId)
+                   .OrderBy(f => f.Name)
+                   .ToList();
+        }
+
+        public async Task<UpdateFileDTO?> UpdateFileAsync(UpdateFileDTO ufd)
+        {
+            var file = await _dbFileRepository.GetByIdAsync(ufd.Id);
+
+            if (file == null)  
+                return null;
+            try
+            {
+                var response = await _dbFileRepository.UpdateFileInDb(file, ufd);
+                return response;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+        public async Task<bool> RollbackToPreviousVersionAsync(int fileId)
+        {
+            try
+            {
+                var file = await _dbFileRepository.GetByIdAsync(fileId);
+
+                if (file == null)
+                    throw new Exception("File does not exist");
+
+                var response = await _dbFileRepository.RollbackFileVersion(file);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public string GetMimeType(string filePath)

@@ -19,33 +19,31 @@ namespace FinalProject.Controllers
             _folderService = folderService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetFolders()
-        {   
-            var folders = await _folderService.GetAllFoldersAsync();
+        //[HttpGet]
+        //public async Task<IActionResult> GetFolders()
+        //{
+        //        var folders = await _folderService.GetAllFoldersAsync();
+        //        return Ok(folders);
+        //}
 
-            return Ok(folders);
-        }
-
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetFolder(int id)
         {
             var folder = await _folderService.GetFolderByIdAsync(id);
-
             if (folder == null)
             {
-                return NotFound();
+                return NotFound($"Folder with ID {id} was not found");
             }
 
             return Ok(folder);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateFolder([FromBody] FolderDTO folderDTO)
+        public async Task<IActionResult> CreateFolder([FromBody] CreatingFolderDTO creatingFolderDTO)
         {
             try
             {
-                var addedFolder = await _folderService.AddFolderAsync(folderDTO);
+                var addedFolder = await _folderService.AddFolderAsync(creatingFolderDTO);
 
                 return Ok(addedFolder);
             }
@@ -56,13 +54,13 @@ namespace FinalProject.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] int[] folderIds)
         {
             try
             {
-                var response = await _folderService.DeleteFoldersAsync(id);
-                return Ok(response);
+                var response = await _folderService.DeleteFoldersAsync(folderIds);
+                return Ok("Folders were deleted");
             }
             catch (Exception ex)
             {   
@@ -70,18 +68,24 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpPost("Rename")]
-        public async Task<IActionResult> RenameFolder([FromBody] RenameFolderDTO renameFolderDTO)
+        [HttpPost("Rename/{userId}")]
+        public async Task<IActionResult> RenameFolder([FromBody] RenameFolderDTO renameFolderDTO, int userId)
         {
-
-            var folder = await _folderService.RenameFolderAsync(renameFolderDTO);
-
-            if (folder == null)
+            try
             {
-                return NotFound();
-            }
+                var folder = await _folderService.RenameFolderAsync(renameFolderDTO, userId);
 
-            return Ok(folder);
+                if (folder == null)
+                {
+                    return NotFound("Folder was not found!");
+                }
+
+                return Ok(folder);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("MoveFolder")]
@@ -98,28 +102,17 @@ namespace FinalProject.Controllers
             }
         }
 
-        [HttpGet("Search/{folderName}")]
-        public async Task<IActionResult> SearchForFolder(string folderName)
+        [HttpGet("Search/{folderName}/{userId}")]
+        public async Task<IActionResult> SearchForFolder(string folderName, int userId)
         {
-            var folders = await _folderService.GetAllFoldersAsync();
-            var matchingFolders = folders
-                .Where(f => f.Name.StartsWith(folderName, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(f => f.Name)
-                .ToList();
+            var result = await _folderService.SearchForFolderAsync(folderName, userId);
 
-            if ( matchingFolders.Count() == 0)
+            if (result.Count() == 0)
             {
                 return NotFound();
             }
 
-            var newList = new List<Folder>();
-            
-            foreach( FolderDTO folder in matchingFolders)
-            {
-                newList.Add(await _folderService.GetFolderByIdAsync(folder.Id));
-            }
-
-            return Ok(newList);
+            return Ok(result);
         }
 
         [HttpPost("UploadFolder")]
@@ -129,7 +122,7 @@ namespace FinalProject.Controllers
             {
                 if (folderDTO == null)
                 {
-                    return BadRequest(new { Message = "Folder cannot be empty" });
+                    return BadRequest(new { Message = "You can not upload nothing." });
                 }
 
                 if (string.IsNullOrEmpty(folderDTO.Name))
@@ -138,11 +131,12 @@ namespace FinalProject.Controllers
                 }
 
                 var response = await _folderService.UploadFolderAsync(folderDTO);
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Errors = ex.Message});
+                return BadRequest(new { Errors = ex.Message });
             }
         }
 

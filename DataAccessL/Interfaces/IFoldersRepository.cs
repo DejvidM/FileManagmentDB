@@ -10,9 +10,12 @@ namespace DataAccessL.Interfaces
 {
     public interface IFoldersRepository
     {
-        Task<Folder> AddAsync(Folder folder);
-        Task<Folder> GetByIdAsync(int id);
         Task<IEnumerable<Folder>> GetAllAsync();
+        Task<Folder> AddAsyncInDb(Folder folder);
+        Task<bool> ExistsWithNameInDirectory(string name, int? parentId, int userId);
+        Task<bool> ExistsWithNameInDirectory(string name, int? parentId, int userId, int folderId);
+        Task<IEnumerable<Folder>> GetChildrenFolders(Folder parentFolder);
+        Task<Folder?> GetByIdAsync(int id);
         Task DeleteAsync(int folderId);
         Task<Folder> RenameFolder(Folder folder, string newName);
         Task<List<Folder>> GetAllUserFoldersFiles(int userId);
